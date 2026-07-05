@@ -66,10 +66,11 @@ input,select,textarea{font-family:inherit;font-size:15px}
     display:flex;position:fixed;bottom:0;left:0;right:0;z-index:20;
     background:var(--surface-1);border-top:1px solid var(--ring);
     padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+    overflow-x:auto;-webkit-overflow-scrolling:touch;
   }
   .bottomnav button{
-    flex:1;border:none;background:none;color:var(--ink-3);font-size:10.5px;
-    display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 0;border-radius:8px;
+    flex:1 0 auto;min-width:52px;border:none;background:none;color:var(--ink-3);font-size:10.5px;
+    display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 6px;border-radius:8px;
   }
   .bottomnav button .ico{font-size:19px}
   .bottomnav button.active{color:var(--accent);font-weight:600}
@@ -186,6 +187,67 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:now
 }
 .empty .e-ico{font-size:34px;display:block;margin-bottom:8px}
 footer.credit{color:var(--ink-3);font-size:12px;text-align:center;padding:26px 0 10px}
+
+/* ---------- Product thumbnails ---------- */
+.thumb{width:36px;height:36px;border-radius:8px;object-fit:cover;background:var(--grid);flex-shrink:0;display:block}
+.thumb-fallback{width:36px;height:36px;border-radius:8px;background:var(--grid);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.prod-card .p-img{width:100%;height:64px;border-radius:8px;object-fit:cover;background:var(--grid);margin-bottom:4px;display:block}
+.prod-card .p-img-fb{width:100%;height:64px;border-radius:8px;background:var(--grid);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:4px}
+.img-preview{max-width:100%;max-height:120px;border-radius:10px;margin-top:6px;display:none}
+
+/* ---------- AI chat ---------- */
+.ai-presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.ai-ask{display:flex;gap:8px}
+.ai-ask textarea{flex:1;min-height:44px;max-height:120px;resize:vertical;padding:10px 12px;border:1px solid var(--ring);border-radius:10px;background:var(--page);color:var(--ink-1)}
+.ai-answer{margin-top:14px;padding:14px 16px;border:1px solid var(--ring);border-radius:12px;background:var(--page);font-size:14px;line-height:1.65;overflow-wrap:break-word}
+.ai-answer h4{font-size:14.5px;margin:10px 0 4px}
+.ai-answer ul,.ai-answer ol{margin:4px 0 8px 22px}
+.ai-answer p{margin:6px 0}
+.ai-q{font-size:12.5px;color:var(--ink-3);margin-top:12px}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid var(--ring);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;vertical-align:-2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ---------- Shop layout (bird's eye view) ---------- */
+.plan-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px}
+.plan-toolbar .pal{border:1px solid var(--ring);border-radius:10px;background:var(--surface-1);color:var(--ink-1);
+  padding:7px 10px;font-size:13px;display:inline-flex;align-items:center;gap:5px}
+.plan-toolbar .pal:hover{border-color:var(--accent)}
+.plan-wrap{overflow:auto;border:1px solid var(--ring);border-radius:12px;background:var(--surface-1);max-height:70vh}
+.plan-grid{position:relative;touch-action:none;background-color:var(--page);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  box-shadow:inset 0 0 0 2px var(--axis)}
+.fixture{position:absolute;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:11px;line-height:1.15;color:#fff;cursor:grab;user-select:none;-webkit-user-select:none;touch-action:none;
+  padding:2px;text-align:center;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.fixture .fx-ico{font-size:16px}
+.fixture.sel{outline:3px solid var(--accent);outline-offset:1px;z-index:5}
+.fixture.dragging{opacity:.75;z-index:9;cursor:grabbing}
+.fixture.bad{outline:3px solid var(--critical)}
+.fx-dot{position:absolute;top:3px;right:3px;width:11px;height:11px;border-radius:50%;border:2px solid #fff}
+.fx-dot.red{background:var(--critical)} .fx-dot.yellow{background:var(--warning)}
+.plan-props{margin-top:12px}
+.prod-check{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:4px;max-height:220px;overflow-y:auto;margin-top:8px}
+.prod-check label{display:flex;align-items:center;gap:8px;font-size:13px;padding:6px 8px;border-radius:8px;cursor:pointer}
+.prod-check label:hover{background:var(--accent-soft)}
+.prod-check input{width:auto}
+
+/* ---------- Print report (PDF via print dialog) ---------- */
+#printReport{display:none}
+@media print{
+  body{background:#fff}
+  .app,.bottomnav,.topbar,footer.credit,#modalRoot{display:none!important}
+  #printReport{display:block;color:#000;font-size:13px;padding:10px}
+  #printReport h1{font-size:20px;margin-bottom:2px}
+  #printReport .pr-sub{color:#555;margin-bottom:14px}
+  #printReport .pr-tiles{display:flex;gap:14px;margin-bottom:16px}
+  #printReport .pr-tile{border:1px solid #ccc;border-radius:8px;padding:10px 14px;flex:1}
+  #printReport .pr-tile .v{font-size:18px;font-weight:700}
+  #printReport table{width:100%;border-collapse:collapse;margin-bottom:16px}
+  #printReport th,#printReport td{border:1px solid #ccc;padding:5px 8px;text-align:left}
+  #printReport th{background:#f0f0f0}
+  #printReport td.num,#printReport th.num{text-align:right}
+  #printReport h2{font-size:15px;margin:14px 0 6px}
+}
 </style>
 </head>
 <body>
@@ -201,6 +263,7 @@ footer.credit{color:var(--ink-3);font-size:12px;text-align:center;padding:26px 0
 </div>
 <nav class="bottomnav" id="bottomnav"></nav>
 <div id="modalRoot"></div>
+<div id="printReport"></div>
 
 <script>
 "use strict";
@@ -212,21 +275,31 @@ footer.credit{color:var(--ink-3);font-size:12px;text-align:center;padding:26px 0
 const LS_KEY = "lmm_data_v1";
 
 const DEFAULT_DATA = {
-  shop: { name: "ร้านค้าของเรา", minStockDefault: 5 },
-  products: [],      // {id,name,category,cost,price,stock,minStock,createdAt}
+  shop: { name: "ร้านค้าของเรา", minStockDefault: 5,
+          ai: { apiKey: "", model: "meta-llama/llama-3.3-70b-instruct:free" } },
+  products: [],      // {id,name,category,cost,price,stock,minStock,imageUrl,createdAt}
   movements: [],     // {id,productId,type:'in'|'out',qty,unit,total,profit,note,date,saleId}
   transactions: [],  // {id,type:'income'|'expense',category,amount,note,date,ref}
   employees: [],     // {id,name,role,phone,salary,startDate,active}
-  payrolls: []       // {id,employeeId,amount,date,note}
+  payrolls: [],      // {id,employeeId,amount,date,note}
+  layout: { cols: 16, rows: 10, items: [] } // items: {id,type,x,y,w,h,label,productIds:[]}
 };
 
 let db = load();
+/* เติมค่าใหม่ให้ข้อมูลเก่าที่บันทึกไว้ก่อนมี field เหล่านี้ */
+function normalizeData(d){
+  const out = Object.assign(structuredClone(DEFAULT_DATA), d);
+  out.shop = Object.assign(structuredClone(DEFAULT_DATA.shop), out.shop||{});
+  out.shop.ai = Object.assign(structuredClone(DEFAULT_DATA.shop.ai), out.shop.ai||{});
+  out.layout = Object.assign(structuredClone(DEFAULT_DATA.layout), out.layout||{});
+  if(!Array.isArray(out.layout.items)) out.layout.items = [];
+  return out;
+}
 function load(){
   try{
     const raw = localStorage.getItem(LS_KEY);
     if(!raw) return structuredClone(DEFAULT_DATA);
-    const d = JSON.parse(raw);
-    return Object.assign(structuredClone(DEFAULT_DATA), d);
+    return normalizeData(JSON.parse(raw));
   }catch(e){ return structuredClone(DEFAULT_DATA); }
 }
 function save(){ localStorage.setItem(LS_KEY, JSON.stringify(db)); }
@@ -257,6 +330,23 @@ function daysAgoISO(n){
 }
 function esc(s){ return String(s??"").replace(/[&<>"']/g, c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 const prodById = id => db.products.find(p=>p.id===id);
+/* รูปสินค้าจากลิงก์ — โหลดไม่ได้/ไม่มีลิงก์ ให้แสดงกล่อง emoji แทน */
+function safeImgUrl(u){
+  u = String(u||"").trim();
+  return /^(https?:|data:image\/)/i.test(u) ? u : "";
+}
+function prodThumb(p){
+  const u = safeImgUrl(p.imageUrl);
+  if(!u) return `<span class="thumb-fallback">📦</span>`;
+  return `<img class="thumb" src="${esc(u)}" alt="" loading="lazy"
+    onerror="this.outerHTML='<span class=&quot;thumb-fallback&quot;>📦</span>'">`;
+}
+function prodCardImg(p){
+  const u = safeImgUrl(p.imageUrl);
+  if(!u) return `<span class="p-img-fb">📦</span>`;
+  return `<img class="p-img" src="${esc(u)}" alt="" loading="lazy"
+    onerror="this.outerHTML='<span class=&quot;p-img-fb&quot;>📦</span>'">`;
+}
 
 /* ---------- aggregations ---------- */
 function sumTx(type, from, to){
@@ -292,6 +382,7 @@ const PAGES = [
   {id:"sale",  ico:"🛒", label:"ขายสินค้า",      short:"ขาย",    render:renderSale,  nav:true},
   {id:"stock", ico:"📦", label:"สินค้า & สต็อก", short:"สต็อก",  render:renderStock, nav:true},
   {id:"money", ico:"💰", label:"รายรับ-รายจ่าย", short:"การเงิน", render:renderMoney, nav:true},
+  {id:"plan",  ico:"🗺️", label:"แปลนร้าน",       short:"แปลน",   render:renderPlan,  nav:true},
   {id:"staff", ico:"👥", label:"พนักงาน",        short:"พนักงาน", render:renderStaff, nav:false},
   {id:"ai",    ico:"🤖", label:"AI วิเคราะห์",    short:"AI",     render:renderAI,    nav:true},
   {id:"set",   ico:"⚙️", label:"ตั้งค่า",         short:"ตั้งค่า", render:renderSettings, nav:false}
@@ -457,6 +548,136 @@ function compactNum(v){
 }
 
 /* =========================================================
+   ส่งออกข้อมูล (CSV / PDF / PNG) — ไม่ใช้ library ภายนอก
+   ========================================================= */
+function downloadBlob(blob, filename){
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 5000);
+}
+function downloadCSV(filename, rows){
+  const escCell = v => {
+    v = String(v??"");
+    return /[",\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v;
+  };
+  // BOM เพื่อให้ Excel เปิดภาษาไทยไม่เพี้ยน
+  const csv = "﻿" + rows.map(r=>r.map(escCell).join(",")).join("\r\n");
+  downloadBlob(new Blob([csv],{type:"text/csv;charset=utf-8"}), filename);
+}
+function exportTxCSV(mk){
+  const list = db.transactions.filter(t=>monthKey(t.date)===mk)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  const rows = [["วันที่","ประเภท","หมวดหมู่","รายละเอียด","จำนวนเงิน(บาท)"]];
+  list.forEach(t=>rows.push([t.date, t.type==="income"?"รายรับ":"รายจ่าย", t.category, t.note||"", t.type==="income"?t.amount:-t.amount]));
+  const inc = monthTx("income",mk), exp = monthTx("expense",mk);
+  rows.push([],["รวมรายรับ","","","",inc],["รวมรายจ่าย","","","",-exp],["คงเหลือ(กำไร)","","","",inc-exp]);
+  downloadCSV(`รายรับรายจ่าย-${mk}.csv`, rows);
+}
+function exportProductsCSV(){
+  const rows = [["ชื่อสินค้า","หมวดหมู่","ราคาทุน","ราคาขาย","คงเหลือ","จุดแจ้งเตือน","มูลค่าสต็อก(ทุน)","ลิงก์รูป"]];
+  db.products.forEach(p=>rows.push([p.name,p.category||"",p.cost,p.price,p.stock,p.minStock,p.cost*p.stock,p.imageUrl||""]));
+  downloadCSV(`รายการสินค้า-${todayISO()}.csv`, rows);
+}
+function exportMovementsCSV(){
+  const rows = [["วันที่","สินค้า","ประเภท","จำนวน","ราคาต่อหน่วย","มูลค่ารวม","หมายเหตุ"]];
+  [...db.movements].sort((a,b)=>a.date.localeCompare(b.date)).forEach(m=>{
+    const p = prodById(m.productId);
+    rows.push([m.date, p?p.name:"(ลบแล้ว)", m.type==="in"?"รับเข้า":"ขายออก", m.qty, m.unit, m.total, m.note||""]);
+  });
+  downloadCSV(`ประวัติเข้าออก-${todayISO()}.csv`, rows);
+}
+function buildMonthlyReport(mk){
+  const income = monthTx("income", mk), expense = monthTx("expense", mk);
+  const txs = db.transactions.filter(t=>monthKey(t.date)===mk)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  const q = salesQtyByProduct(mk+"-01", mk+"-31");
+  const top = Object.entries(q).map(([pid,qty])=>({p:prodById(pid),qty})).filter(x=>x.p)
+    .sort((a,b)=>b.qty-a.qty).slice(0,8);
+  const byCat = {};
+  txs.filter(t=>t.type==="expense").forEach(t=>{ byCat[t.category]=(byCat[t.category]||0)+t.amount; });
+  return { mk, income, expense, profit: income-expense, txs, top,
+    expCats: Object.entries(byCat).sort((a,b)=>b[1]-a[1]) };
+}
+function exportMonthPDF(mk){
+  const r = buildMonthlyReport(mk);
+  document.getElementById("printReport").innerHTML = `
+    <h1>${esc(db.shop.name)} — รายงานประจำเดือน</h1>
+    <div class="pr-sub">${monthName(mk)} · จัดทำเมื่อ ${fmtDate(todayISO())}</div>
+    <div class="pr-tiles">
+      <div class="pr-tile">รายรับ<div class="v">${THB(r.income)}</div></div>
+      <div class="pr-tile">รายจ่าย<div class="v">${THB(r.expense)}</div></div>
+      <div class="pr-tile">กำไร<div class="v">${THB(r.profit)}</div></div>
+    </div>
+    <h2>สินค้าขายดี</h2>
+    <table><tr><th>สินค้า</th><th class="num">จำนวนที่ขาย</th><th class="num">คงเหลือ</th></tr>
+      ${r.top.map(x=>`<tr><td>${esc(x.p.name)}</td><td class="num">${NUM(x.qty)}</td><td class="num">${NUM(x.p.stock)}</td></tr>`).join("")||`<tr><td colspan="3">ไม่มีข้อมูล</td></tr>`}
+    </table>
+    <h2>รายจ่ายตามหมวด</h2>
+    <table><tr><th>หมวด</th><th class="num">จำนวนเงิน</th></tr>
+      ${r.expCats.map(([c,v])=>`<tr><td>${esc(c)}</td><td class="num">${THB(v)}</td></tr>`).join("")||`<tr><td colspan="2">ไม่มีข้อมูล</td></tr>`}
+    </table>
+    <h2>รายการรับ-จ่ายทั้งหมด (${r.txs.length} รายการ)</h2>
+    <table><tr><th>วันที่</th><th>ประเภท</th><th>หมวด</th><th>รายละเอียด</th><th class="num">จำนวนเงิน</th></tr>
+      ${r.txs.map(t=>`<tr><td>${fmtDate(t.date)}</td><td>${t.type==="income"?"รายรับ":"รายจ่าย"}</td>
+        <td>${esc(t.category)}</td><td>${esc(t.note||"")}</td>
+        <td class="num">${t.type==="income"?"":"−"}${THB(t.amount)}</td></tr>`).join("")}
+    </table>`;
+  window.print();
+}
+function exportMonthPNG(mk){
+  const r = buildMonthlyReport(mk);
+  const W = 900, rowH = 34;
+  const H = 320 + Math.max(r.top.length, 1)*rowH + 90 + Math.max(r.expCats.length,1)*rowH + 60;
+  const cv = document.createElement("canvas");
+  cv.width = W*2; cv.height = H*2;                 // วาด 2x ให้คมชัด
+  const ctx = cv.getContext("2d");
+  ctx.scale(2,2);
+  const font = s => `${s} system-ui, 'Noto Sans Thai', sans-serif`;
+  ctx.fillStyle = "#ffffff"; ctx.fillRect(0,0,W,H);
+  ctx.fillStyle = "#0b0b0b"; ctx.font = font("bold 26px");
+  ctx.fillText(`${db.shop.name} — รายงานเดือน ${monthName(mk)}`, 30, 48);
+  ctx.fillStyle = "#777"; ctx.font = font("14px");
+  ctx.fillText(`จัดทำเมื่อ ${fmtDate(todayISO())}`, 30, 72);
+  // tiles
+  const tiles = [["รายรับ",THB(r.income),"#2a78d6"],["รายจ่าย",THB(r.expense),"#e34948"],["กำไร",THB(r.profit),r.profit>=0?"#006300":"#d03b3b"]];
+  tiles.forEach((t,i)=>{
+    const x = 30 + i*285;
+    ctx.strokeStyle = "#ddd"; ctx.strokeRect(x, 95, 260, 80);
+    ctx.fillStyle = "#777"; ctx.font = font("14px"); ctx.fillText(t[0], x+16, 122);
+    ctx.fillStyle = t[2]; ctx.font = font("bold 26px"); ctx.fillText(t[1], x+16, 158);
+  });
+  // top products bars
+  let y = 225;
+  ctx.fillStyle = "#0b0b0b"; ctx.font = font("bold 17px"); ctx.fillText("สินค้าขายดี", 30, y); y += 16;
+  const maxQ = Math.max(...r.top.map(x=>x.qty), 1);
+  if(!r.top.length){ ctx.fillStyle="#999"; ctx.font=font("14px"); ctx.fillText("ไม่มีข้อมูล", 30, y+20); y += rowH; }
+  r.top.forEach(x=>{
+    ctx.fillStyle = "#0b0b0b"; ctx.font = font("14px");
+    ctx.fillText(x.p.name.slice(0,28), 30, y+16);
+    ctx.fillStyle = "#e8e8e8"; ctx.fillRect(300, y+4, 440, 16);
+    ctx.fillStyle = "#2a78d6"; ctx.fillRect(300, y+4, Math.max(6, x.qty/maxQ*440), 16);
+    ctx.fillStyle = "#0b0b0b"; ctx.fillText(NUM(x.qty)+" ชิ้น", 755, y+17);
+    y += rowH;
+  });
+  // expenses by category
+  y += 40;
+  ctx.fillStyle = "#0b0b0b"; ctx.font = font("bold 17px"); ctx.fillText("รายจ่ายตามหมวด", 30, y); y += 16;
+  const maxE = Math.max(...r.expCats.map(x=>x[1]), 1);
+  if(!r.expCats.length){ ctx.fillStyle="#999"; ctx.font=font("14px"); ctx.fillText("ไม่มีข้อมูล", 30, y+20); y += rowH; }
+  r.expCats.forEach(([c,v])=>{
+    ctx.fillStyle = "#0b0b0b"; ctx.font = font("14px");
+    ctx.fillText(c.slice(0,28), 30, y+16);
+    ctx.fillStyle = "#e8e8e8"; ctx.fillRect(300, y+4, 440, 16);
+    ctx.fillStyle = "#e34948"; ctx.fillRect(300, y+4, Math.max(6, v/maxE*440), 16);
+    ctx.fillStyle = "#0b0b0b"; ctx.fillText(THB(v), 755, y+17);
+    y += rowH;
+  });
+  cv.toBlob(b=>downloadBlob(b, `รายงาน-${mk}.png`), "image/png");
+}
+
+/* =========================================================
    หน้า: ภาพรวม (Dashboard)
    ========================================================= */
 function renderDash(el){
@@ -588,6 +809,7 @@ function renderSale(el){
     }
     pick.innerHTML = list.map(p=>`
       <button class="prod-card" data-id="${p.id}" ${p.stock<=0?"disabled":""}>
+        ${prodCardImg(p)}
         <span class="p-name">${esc(p.name)}</span>
         <span class="p-price">${THB(p.price)}</span>
         <span class="p-stock">${p.stock<=0?"สินค้าหมด":"คงเหลือ "+NUM(p.stock)}</span>
@@ -683,8 +905,12 @@ function renderStock(el){
       <input type="search" id="stSearch" placeholder="🔍 ค้นหาสินค้า...">
       <button class="btn" id="addProd">+ เพิ่มสินค้า</button>
     </div>
-    <div class="card" style="margin-top:0"><div class="tbl-wrap" id="prodTable"></div></div>
-    <div class="card"><h3>ประวัติรับเข้า-ขายออก ล่าสุด</h3><div class="tbl-wrap" id="mvTable"></div></div>`;
+    <div class="card" style="margin-top:0"><div class="tbl-wrap" id="prodTable"></div>
+      <div style="margin-top:12px"><button class="btn secondary sm" id="expProdCsv">📑 ส่งออกรายการสินค้า (CSV)</button></div>
+    </div>
+    <div class="card"><h3>ประวัติรับเข้า-ขายออก ล่าสุด</h3><div class="tbl-wrap" id="mvTable"></div>
+      <div style="margin-top:12px"><button class="btn secondary sm" id="expMvCsv">📑 ส่งออกประวัติทั้งหมด (CSV)</button></div>
+    </div>`;
 
   const draw = (filter="")=>{
     const list = db.products.filter(p=>p.name.toLowerCase().includes(filter.toLowerCase()) || (p.category||"").toLowerCase().includes(filter.toLowerCase()));
@@ -700,7 +926,7 @@ function renderStock(el){
                  : p.stock<=p.minStock?`<span class="badge low">ใกล้หมด</span>`
                  : `<span class="badge ok">ปกติ</span>`;
         return `<tr>
-          <td style="font-weight:600">${esc(p.name)}</td>
+          <td style="font-weight:600"><span style="display:flex;align-items:center;gap:9px">${prodThumb(p)}${esc(p.name)}</span></td>
           <td class="small muted">${esc(p.category||"-")}</td>
           <td class="num">${THB(p.cost)}</td>
           <td class="num">${THB(p.price)}</td>
@@ -741,6 +967,8 @@ function renderStock(el){
   };
   el.querySelector("#addProd").onclick = ()=>productModal(null, ()=>{draw(); drawMv();});
   el.querySelector("#stSearch").oninput = e=>draw(e.target.value);
+  el.querySelector("#expProdCsv").onclick = exportProductsCSV;
+  el.querySelector("#expMvCsv").onclick = exportMovementsCSV;
   draw(); drawMv();
 }
 
@@ -756,16 +984,29 @@ function productModal(p, done){
       <div class="field"><label>จำนวนคงเหลือ</label><input name="stock" type="number" min="0" step="1" value="${p?p.stock:0}" ${p?"disabled":""}></div>
       <div class="field"><label>แจ้งเตือนเมื่อต่ำกว่า</label><input name="minStock" type="number" min="0" step="1" value="${p?p.minStock:db.shop.minStockDefault}"></div>
     </div>
+    <div class="field"><label>ลิงก์รูปภาพสินค้า (ไม่บังคับ)</label>
+      <input name="imageUrl" id="pImgUrl" value="${p?esc(p.imageUrl||""):""}" placeholder="วางลิงก์รูปจากเน็ต เช่น https://...jpg">
+      <img id="pImgPrev" class="img-preview" alt="">
+      <div class="small muted" style="margin-top:4px">คัดลอกลิงก์รูปจากเว็บ (คลิกขวา/กดค้างที่รูป → คัดลอกที่อยู่รูปภาพ) — รูปจะแสดงเมื่อมีอินเทอร์เน็ต</div>
+    </div>
     ${p?`<div class="small muted">* แก้จำนวนคงเหลือผ่านปุ่ม "รับเข้า" หรือการขาย เพื่อให้ประวัติถูกต้อง</div>`:""}`,
     fd=>{
       if(p){
-        Object.assign(p,{name:fd.name.trim(),category:fd.category.trim(),cost:+fd.cost,price:+fd.price,minStock:+fd.minStock||0});
+        Object.assign(p,{name:fd.name.trim(),category:fd.category.trim(),cost:+fd.cost,price:+fd.price,minStock:+fd.minStock||0,imageUrl:fd.imageUrl.trim()});
       }else{
         db.products.push({id:uid(),name:fd.name.trim(),category:fd.category.trim(),cost:+fd.cost,price:+fd.price,
-          stock:+fd.stock||0,minStock:+fd.minStock||0,createdAt:todayISO()});
+          stock:+fd.stock||0,minStock:+fd.minStock||0,imageUrl:fd.imageUrl.trim(),createdAt:todayISO()});
       }
       save(); done();
     });
+  // พรีวิวรูปสดในฟอร์ม
+  const urlIn = document.getElementById("pImgUrl"), prev = document.getElementById("pImgPrev");
+  const updPrev = ()=>{
+    const u = safeImgUrl(urlIn.value);
+    if(u){ prev.src = u; prev.style.display = "block"; } else prev.style.display = "none";
+  };
+  prev.onerror = ()=>{ prev.style.display = "none"; };
+  urlIn.oninput = updPrev; updPrev();
 }
 
 function stockInModal(p, done){
@@ -820,7 +1061,16 @@ function renderMoney(el){
       <button class="btn" id="addTx">+ เพิ่มรายการ</button>
     </div>
     <div class="grid-tiles" id="mTiles"></div>
-    <div class="card" style="margin-top:0"><div class="tbl-wrap" id="txTable"></div></div>`;
+    <div class="card" style="margin-top:0"><div class="tbl-wrap" id="txTable"></div></div>
+    <div class="card">
+      <h3>📤 ส่งออกรายงานเดือนที่เลือก</h3>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn secondary" id="expPdf">📄 PDF (พิมพ์/บันทึก)</button>
+        <button class="btn secondary" id="expPng">🖼️ รูปภาพ PNG</button>
+        <button class="btn secondary" id="expCsv">📑 ไฟล์ CSV (Excel)</button>
+      </div>
+      <div class="small muted" style="margin-top:8px">PDF: จะเปิดหน้าต่างพิมพ์ — เลือก "บันทึกเป็น PDF" · PNG: เหมาะส่งต่อทางไลน์ · CSV: เปิดใน Excel ได้</div>
+    </div>`;
 
   const draw = ()=>{
     const inc = monthTx("income", moneyMonth), exp = monthTx("expense", moneyMonth);
@@ -850,6 +1100,9 @@ function renderMoney(el){
     });
   };
   el.querySelector("#mSel").onchange = e=>{ moneyMonth = e.target.value; draw(); };
+  el.querySelector("#expPdf").onclick = ()=>exportMonthPDF(moneyMonth);
+  el.querySelector("#expPng").onclick = ()=>exportMonthPNG(moneyMonth);
+  el.querySelector("#expCsv").onclick = ()=>exportTxCSV(moneyMonth);
   el.querySelectorAll(".seg [data-f]").forEach(b=>{
     b.onclick = ()=>{ moneyFilter = b.dataset.f;
       el.querySelectorAll(".seg [data-f]").forEach(x=>x.classList.toggle("active",x===b)); draw(); };
@@ -968,15 +1221,162 @@ function renderStaff(el){
 /* =========================================================
    หน้า: AI วิเคราะห์ (rule-based, ทำงานในเครื่อง)
    ========================================================= */
+/* ---------- ถาม AI ผ่าน OpenRouter ---------- */
+let aiLast = null; // {q, html} จำคำตอบล่าสุดไว้ตอนสลับหน้าไปมา
+let aiBusy = false;
+
+function buildShopSummary(){
+  const today = todayISO();
+  const months = [];
+  for(let i=2;i>=0;i--){
+    const d = new Date(); d.setDate(1); d.setMonth(d.getMonth()-i);
+    const mk = d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+    months.push({เดือน:mk, รายรับ:monthTx("income",mk), รายจ่าย:monthTx("expense",mk)});
+  }
+  const from90 = daysAgoISO(90);
+  const q90 = salesQtyByProduct(from90, today);
+  const products = [...db.products]
+    .map(p=>({ชื่อ:p.name, หมวด:p.category||"", ทุน:p.cost, ราคาขาย:p.price, คงเหลือ:p.stock,
+      จุดเตือน:p.minStock, ขาย90วัน:q90[p.id]||0}))
+    .sort((a,b)=>b["ขาย90วัน"]-a["ขาย90วัน"]).slice(0,60);
+  const expCats = {};
+  db.transactions.filter(t=>t.type==="expense"&&t.date>=daysAgoISO(60))
+    .forEach(t=>{ expCats[t.category]=(expCats[t.category]||0)+t.amount; });
+  const dayNames = ["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัส","ศุกร์","เสาร์"];
+  const byDay = {};
+  db.transactions.filter(t=>t.type==="income"&&t.date>=daysAgoISO(60)).forEach(t=>{
+    const n = dayNames[new Date(t.date+"T00:00:00").getDay()];
+    byDay[n] = (byDay[n]||0)+t.amount;
+  });
+  return JSON.stringify({
+    ชื่อร้าน: db.shop.name, วันที่วันนี้: today,
+    สรุปรายเดือน: months,
+    สินค้า_เรียงตามขายดี: products,
+    รายจ่ายตามหมวด_60วัน: expCats,
+    ยอดขายแยกวันในสัปดาห์_60วัน: byDay,
+    จำนวนพนักงาน: db.employees.length
+  });
+}
+
+async function askAI(question){
+  const {apiKey, model} = db.shop.ai;
+  const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer "+apiKey,
+      "Content-Type": "application/json",
+      "X-Title": "Local Mart Manager"
+    },
+    signal: AbortSignal.timeout(90000),
+    body: JSON.stringify({
+      model,
+      messages: [
+        {role:"system", content:
+`คุณคือที่ปรึกษาธุรกิจร้านขายของชำ/ร้านโชห่วยขนาดเล็กในไทย ผู้ใช้เป็นเจ้าของร้านเล็กๆ ที่ให้ญาติช่วยเฝ้าร้าน
+ตอบเป็นภาษาไทยที่เข้าใจง่าย ใช้ข้อมูลจริงของร้าน (JSON ด้านล่าง) อ้างอิงตัวเลขจริงเสมอ ให้คำแนะนำที่ทำได้จริงกับร้านเล็ก งบน้อย
+จัดรูปแบบ: หัวข้อสั้นๆ + bullet points กระชับ ไม่เกิน ~400 คำ
+
+ข้อมูลร้าน:
+${buildShopSummary()}`},
+        {role:"user", content: question}
+      ]
+    })
+  });
+  if(!res.ok){
+    let msg = "";
+    try{ msg = (await res.json()).error?.message || ""; }catch(e){}
+    if(res.status===401) throw new Error("API key ไม่ถูกต้อง — ตรวจสอบที่หน้า ตั้งค่า");
+    if(res.status===402) throw new Error("เครดิต OpenRouter หมด — เติมเครดิตหรือเปลี่ยนเป็นโมเดลฟรี (:free)");
+    if(res.status===429) throw new Error("เรียกใช้ถี่เกินไป/โมเดลฟรีคิวเต็ม — รอสักครู่แล้วลองใหม่");
+    throw new Error(`เกิดข้อผิดพลาด (${res.status}) ${msg}`);
+  }
+  const data = await res.json();
+  const content = data.choices?.[0]?.message?.content;
+  if(!content) throw new Error("AI ไม่ตอบกลับ — ลองใหม่หรือเปลี่ยนโมเดล");
+  return content;
+}
+
+/* แปลง markdown อย่างง่ายเป็น HTML (escape ก่อนเสมอ) */
+function mdToHtml(md){
+  const lines = esc(md).split("\n");
+  let html = "", inList = false;
+  const inline = s => s
+    .replace(/\*\*(.+?)\*\*/g, "<b>$1</b>")
+    .replace(/`(.+?)`/g, "<code>$1</code>");
+  for(let ln of lines){
+    const t = ln.trim();
+    const bullet = t.match(/^[-*•] +(.*)/) || t.match(/^\d+[.)] +(.*)/);
+    if(bullet){
+      if(!inList){ html += "<ul>"; inList = true; }
+      html += "<li>"+inline(bullet[1])+"</li>";
+      continue;
+    }
+    if(inList){ html += "</ul>"; inList = false; }
+    if(!t){ continue; }
+    const h = t.match(/^#{1,4} +(.*)/);
+    if(h){ html += "<h4>"+inline(h[1])+"</h4>"; continue; }
+    html += "<p>"+inline(t)+"</p>";
+  }
+  if(inList) html += "</ul>";
+  return html;
+}
+
 function renderAI(el){
+  const hasKey = !!db.shop.ai.apiKey;
   el.innerHTML = `
     <div class="page-title">🤖 AI ช่วยวิเคราะห์ร้าน</div>
-    <div class="page-sub">วิเคราะห์จากข้อมูลจริงในร้านของคุณ ทำงานในเครื่องทั้งหมด ไม่ต้องต่ออินเทอร์เน็ต</div>
+    <div class="page-sub">ถาม AI ได้โดยตรง (ผ่าน OpenRouter ต้องมีอินเทอร์เน็ต) ส่วนวิเคราะห์พื้นฐานด้านล่างทำงานในเครื่อง ใช้ได้แม้ไม่มีเน็ต</div>
+    <div class="card" style="margin-top:0;margin-bottom:16px">
+      <h3>💬 ถาม AI (OpenRouter)</h3>
+      ${hasKey ? `
+        <div class="ai-presets">
+          <button class="btn secondary sm ai-preset" data-q="ช่วยวิเคราะห์ยอดขายของร้านฉันหน่อย มีอะไรน่าสนใจ จุดแข็งจุดอ่อนคืออะไร">📊 วิเคราะห์ยอดขาย</button>
+          <button class="btn secondary sm ai-preset" data-q="ช่วยวางแผนการขายและการสั่งของสำหรับสัปดาห์หน้า ควรเติมสินค้าอะไรเท่าไหร่ และควรจัดโปรโมชั่นอะไรบ้าง">🗓️ วางแผนขายสัปดาห์หน้า</button>
+          <button class="btn secondary sm ai-preset" data-q="ร้านฉันมีจุดไหนที่ควรปรับปรุงบ้าง ทั้งเรื่องกำไร สต็อก และรายจ่าย ช่วยแนะนำแบบทำได้จริง">💡 หาจุดที่ควรปรับปรุง</button>
+        </div>
+        <div class="ai-ask">
+          <textarea id="aiQ" placeholder="หรือพิมพ์คำถามเอง เช่น สินค้าไหนควรเลิกขาย, ตั้งราคาน้ำดื่มเท่าไหร่ดี..."></textarea>
+          <button class="btn" id="aiSend">ถาม</button>
+        </div>
+        <div id="aiOut">${aiLast ? `<div class="ai-q">คำถาม: ${esc(aiLast.q)}</div><div class="ai-answer">${aiLast.html}</div>` : ""}</div>
+      ` : `
+        <p style="font-size:14px;color:var(--ink-2);margin-bottom:10px">
+          ยังไม่ได้ตั้งค่า API key — สมัครฟรีที่ <b>openrouter.ai</b> → สร้าง API key → นำมาใส่ในหน้าตั้งค่า
+          (มีโมเดลฟรีให้ใช้ ไม่ต้องเติมเงินก็เริ่มได้)</p>
+        <button class="btn" id="goSet">⚙️ ไปตั้งค่า AI</button>
+      `}
+    </div>
+    <h3 style="font-size:15px;margin-bottom:10px">การวิเคราะห์พื้นฐาน (ทำงานในเครื่อง)</h3>
     <div id="insights"></div>
     <div class="two-col" style="margin-top:16px">
       <div class="card" style="margin-top:0"><h3>สัดส่วนรายจ่าย ${monthName(thisMonth())}</h3><div id="expBreak"></div></div>
       <div class="card" style="margin-top:0"><h3>กำไรขั้นต้นต่อชิ้น (สูงสุด)</h3><div id="marginList"></div></div>
     </div>`;
+
+  // ---- AI handlers ----
+  const goSet = el.querySelector("#goSet");
+  if(goSet) goSet.onclick = ()=>go("set");
+  const runAsk = async q=>{
+    q = (q||"").trim();
+    if(!q || aiBusy) return;
+    aiBusy = true;
+    const out = el.querySelector("#aiOut");
+    out.innerHTML = `<div class="ai-q">คำถาม: ${esc(q)}</div>
+      <div class="ai-answer"><span class="spin"></span> กำลังคิด... (อาจใช้เวลา 10-30 วินาที)</div>`;
+    try{
+      const ans = await askAI(q);
+      aiLast = {q, html: mdToHtml(ans)};
+      out.innerHTML = `<div class="ai-q">คำถาม: ${esc(q)}</div><div class="ai-answer">${aiLast.html}</div>`;
+    }catch(err){
+      const msg = err.name==="TimeoutError" ? "หมดเวลารอ — เน็ตช้าหรือโมเดลไม่ตอบ ลองใหม่อีกครั้ง"
+        : (err.message.includes("fetch")||err.name==="TypeError") ? "เชื่อมต่อไม่ได้ — ตรวจสอบอินเทอร์เน็ตแล้วลองใหม่"
+        : err.message;
+      out.innerHTML = `<div class="ai-answer" style="border-color:rgba(208,59,59,.5)">⚠️ ${esc(msg)}</div>`;
+    }finally{ aiBusy = false; }
+  };
+  el.querySelectorAll(".ai-preset").forEach(b=>{ b.onclick = ()=>runAsk(b.dataset.q); });
+  const sendBtn = el.querySelector("#aiSend");
+  if(sendBtn) sendBtn.onclick = ()=>{ runAsk(el.querySelector("#aiQ").value); el.querySelector("#aiQ").value=""; };
 
   const box = el.querySelector("#insights");
   const insights = buildInsights();
@@ -1099,6 +1499,227 @@ function buildInsights(){
 }
 
 /* =========================================================
+   หน้า: แปลนร้าน (bird's eye view)
+   ========================================================= */
+const CELL = 44; // ขนาด 1 ช่องกริด (px)
+const FIXTYPES = {
+  shelf:   {name:"ชั้นวางของ",   ico:"🗄️", color:"#8c6a4f", w:4, h:1},
+  fridge:  {name:"ตู้แช่เย็น",   ico:"🧊", color:"#2a78d6", w:2, h:1},
+  icecream:{name:"ตู้ไอติม",     ico:"🍦", color:"#c94f79", w:2, h:1},
+  freezer: {name:"ตู้แช่แข็ง",   ico:"❄️", color:"#4a3aa7", w:2, h:1},
+  counter: {name:"เคาน์เตอร์คิดเงิน", ico:"💵", color:"#a97400", w:3, h:1},
+  table:   {name:"โต๊ะ",         ico:"🪑", color:"#6b6963", w:2, h:2},
+  door:    {name:"ประตูเข้า",    ico:"🚪", color:"#0a7d0a", w:2, h:1},
+  wall:    {name:"ผนัง/ฉากกั้น",  ico:"▪️", color:"#43423e", w:1, h:3}
+};
+let planSel = null; // id ของ fixture ที่เลือกอยู่
+
+function planFits(items, ignoreId, x, y, w, h){
+  const L = db.layout;
+  if(x<0 || y<0 || x+w>L.cols || y+h>L.rows) return false;
+  return !items.some(o=>{
+    if(o.id===ignoreId) return false;
+    return x < o.x+o.w && x+w > o.x && y < o.y+o.h && y+h > o.y;
+  });
+}
+function planFindFree(w, h){
+  const L = db.layout;
+  for(let y=0; y<=L.rows-h; y++)
+    for(let x=0; x<=L.cols-w; x++)
+      if(planFits(L.items, null, x, y, w, h)) return {x,y};
+  return null;
+}
+function fixtureStatus(item){
+  const prods = (item.productIds||[]).map(prodById).filter(Boolean);
+  if(prods.some(p=>p.stock===0)) return "red";
+  if(prods.some(p=>p.stock<=p.minStock)) return "yellow";
+  return null;
+}
+
+function renderPlan(el){
+  el.innerHTML = `
+    <div class="page-title">🗺️ แปลนร้าน (มุมมองจากด้านบน)</div>
+    <div class="page-sub">จำลองผังร้าน: แตะปุ่มด้านล่างเพื่อวางชั้น/ตู้ แล้วลากจัดตำแหน่ง · แตะที่ชิ้นไหนเพื่อตั้งชื่อ ปรับขนาด และเลือกสินค้าที่วางไว้ · จุดสีบนชิ้น = มีสินค้าใกล้หมด(เหลือง)/หมด(แดง)</div>
+    <div class="card" style="margin-top:0">
+      <div class="plan-toolbar" id="palette">
+        ${Object.entries(FIXTYPES).map(([k,t])=>
+          `<button class="pal" data-t="${k}">${t.ico} ${t.name}</button>`).join("")}
+        <span style="flex:1"></span>
+        <span class="small muted">ขนาดร้าน:</span>
+        <span class="qty-ctl"><button id="colsDec">−</button><span id="colsVal">${db.layout.cols}</span><button id="colsInc">+</button></span>
+        <span class="small muted">×</span>
+        <span class="qty-ctl"><button id="rowsDec">−</button><span id="rowsVal">${db.layout.rows}</span><button id="rowsInc">+</button></span>
+      </div>
+      <div class="plan-wrap"><div class="plan-grid" id="planGrid"></div></div>
+      <div class="plan-props" id="planProps"></div>
+    </div>`;
+
+  const grid = el.querySelector("#planGrid");
+
+  const drawGrid = ()=>{
+    const L = db.layout;
+    grid.style.width = L.cols*CELL+"px";
+    grid.style.height = L.rows*CELL+"px";
+    grid.style.backgroundSize = CELL+"px "+CELL+"px";
+    grid.innerHTML = L.items.map(it=>{
+      const t = FIXTYPES[it.type] || FIXTYPES.shelf;
+      const st = fixtureStatus(it);
+      return `<div class="fixture ${it.id===planSel?"sel":""}" data-id="${it.id}" style="
+        left:${it.x*CELL+2}px; top:${it.y*CELL+2}px; width:${it.w*CELL-4}px; height:${it.h*CELL-4}px;
+        background:${t.color}">
+        <span class="fx-ico">${t.ico}</span>
+        ${it.w*CELL>=70 && it.h*CELL>=40 ? `<span>${esc(it.label||t.name)}</span>` : ""}
+        ${st?`<span class="fx-dot ${st}"></span>`:""}
+      </div>`;
+    }).join("") + (L.items.length ? "" :
+      `<div class="empty" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+        <span class="e-ico">🗺️</span>ร้านยังว่าง — แตะปุ่มด้านบน เช่น "🗄️ ชั้นวางของ" เพื่อเริ่มวางผัง</div>`);
+    grid.querySelectorAll(".fixture").forEach(bindFixture);
+  };
+
+  const drawProps = ()=>{
+    const box = el.querySelector("#planProps");
+    const it = db.layout.items.find(i=>i.id===planSel);
+    if(!it){ box.innerHTML = ""; return; }
+    const t = FIXTYPES[it.type] || FIXTYPES.shelf;
+    const pids = it.productIds || (it.productIds = []);
+    box.innerHTML = `
+      <div style="border-top:1px solid var(--grid);padding-top:14px">
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:18px">${t.ico}</span>
+          <input id="fxLabel" value="${esc(it.label||"")}" placeholder="${t.name}" style="flex:1;min-width:120px;padding:7px 10px;border:1px solid var(--ring);border-radius:8px;background:var(--page);color:var(--ink-1)">
+          <span class="small muted">กว้าง</span>
+          <span class="qty-ctl"><button data-p="w-">−</button><span>${it.w}</span><button data-p="w+">+</button></span>
+          <span class="small muted">ลึก</span>
+          <span class="qty-ctl"><button data-p="h-">−</button><span>${it.h}</span><button data-p="h+">+</button></span>
+          <button class="btn secondary sm" id="fxRot">🔄 หมุน</button>
+          <button class="btn sm" id="fxDel" style="background:var(--critical)">🗑️ ลบ</button>
+        </div>
+        <div style="margin-top:10px">
+          <b style="font-size:13.5px">สินค้าที่วางบน${esc(it.label||t.name)} (${pids.length})</b>
+          ${db.products.length ? `<div class="prod-check">
+            ${db.products.map(p=>{
+              const chk = pids.includes(p.id);
+              const badge = p.stock===0?`<span class="badge out">หมด</span>`
+                : p.stock<=p.minStock?`<span class="badge low">เหลือ ${NUM(p.stock)}</span>`
+                : `<span class="small muted">เหลือ ${NUM(p.stock)}</span>`;
+              return `<label><input type="checkbox" data-pid="${p.id}" ${chk?"checked":""}>
+                <span style="flex:1">${esc(p.name)}</span>${badge}</label>`;
+            }).join("")}
+          </div>` : `<div class="small muted" style="margin-top:6px">ยังไม่มีสินค้าในระบบ — เพิ่มที่หน้า สินค้า & สต็อก ก่อน</div>`}
+        </div>
+      </div>`;
+    box.querySelector("#fxLabel").oninput = e=>{ it.label = e.target.value; save(); drawGridSoft(); };
+    box.querySelectorAll("[data-p]").forEach(b=>{
+      b.onclick = ()=>{
+        let {w,h} = it;
+        if(b.dataset.p==="w+") w++; if(b.dataset.p==="w-") w--;
+        if(b.dataset.p==="h+") h++; if(b.dataset.p==="h-") h--;
+        if(w<1||h<1) return;
+        if(planFits(db.layout.items, it.id, it.x, it.y, w, h)){ it.w=w; it.h=h; save(); drawGrid(); drawProps(); }
+      };
+    });
+    box.querySelector("#fxRot").onclick = ()=>{
+      if(planFits(db.layout.items, it.id, it.x, it.y, it.h, it.w)){
+        [it.w, it.h] = [it.h, it.w]; save(); drawGrid(); drawProps();
+      }
+    };
+    box.querySelector("#fxDel").onclick = ()=>confirmBox(`ลบ "${esc(it.label||t.name)}" ออกจากแปลน?`, ()=>{
+      db.layout.items = db.layout.items.filter(x=>x.id!==it.id);
+      planSel = null; save(); drawGrid(); drawProps();
+    });
+    box.querySelectorAll("[data-pid]").forEach(cb=>{
+      cb.onchange = ()=>{
+        const pid = cb.dataset.pid;
+        if(cb.checked){ if(!pids.includes(pid)) pids.push(pid); }
+        else it.productIds = it.productIds.filter(x=>x!==pid);
+        save(); drawGridSoft(); drawProps();
+      };
+    });
+  };
+  // อัปเดตป้าย/จุดสถานะโดยไม่ rebuild ทั้งกริด (กัน focus หลุดจากช่องชื่อ)
+  const drawGridSoft = ()=>{
+    const it = db.layout.items.find(i=>i.id===planSel);
+    if(!it) return;
+    const elFx = grid.querySelector(`.fixture[data-id="${it.id}"]`);
+    if(!elFx) return;
+    const t = FIXTYPES[it.type] || FIXTYPES.shelf;
+    const lbl = elFx.querySelector("span:nth-child(2)");
+    if(lbl && !lbl.classList.contains("fx-dot")) lbl.textContent = it.label || t.name;
+    elFx.querySelector(".fx-dot")?.remove();
+    const st = fixtureStatus(it);
+    if(st) elFx.insertAdjacentHTML("beforeend", `<span class="fx-dot ${st}"></span>`);
+  };
+
+  const bindFixture = fx=>{
+    const it = db.layout.items.find(i=>i.id===fx.dataset.id);
+    fx.addEventListener("pointerdown", e=>{
+      e.preventDefault();
+      fx.setPointerCapture(e.pointerId);
+      const startX = e.clientX, startY = e.clientY;
+      const origX = it.x, origY = it.y;
+      let moved = false, gx = it.x, gy = it.y;
+      const onMove = ev=>{
+        const dx = ev.clientX-startX, dy = ev.clientY-startY;
+        if(!moved && Math.hypot(dx,dy) < 6) return;
+        moved = true;
+        fx.classList.add("dragging");
+        gx = Math.max(0, Math.min(db.layout.cols-it.w, origX + Math.round(dx/CELL)));
+        gy = Math.max(0, Math.min(db.layout.rows-it.h, origY + Math.round(dy/CELL)));
+        fx.style.left = gx*CELL+2+"px";
+        fx.style.top = gy*CELL+2+"px";
+        fx.classList.toggle("bad", !planFits(db.layout.items, it.id, gx, gy, it.w, it.h));
+      };
+      const onUp = ()=>{
+        fx.removeEventListener("pointermove", onMove);
+        fx.removeEventListener("pointerup", onUp);
+        fx.removeEventListener("pointercancel", onUp);
+        fx.classList.remove("dragging","bad");
+        if(moved){
+          if(planFits(db.layout.items, it.id, gx, gy, it.w, it.h)){ it.x=gx; it.y=gy; save(); }
+          drawGrid();
+        }else{
+          planSel = (planSel===it.id) ? null : it.id;
+          drawGrid(); drawProps();
+        }
+      };
+      fx.addEventListener("pointermove", onMove);
+      fx.addEventListener("pointerup", onUp);
+      fx.addEventListener("pointercancel", onUp);
+    });
+  };
+
+  el.querySelector("#palette").querySelectorAll("[data-t]").forEach(b=>{
+    b.onclick = ()=>{
+      const t = FIXTYPES[b.dataset.t];
+      const spot = planFindFree(t.w, t.h) || planFindFree(1,1);
+      if(!spot){ alert("แปลนเต็มแล้ว — ขยายขนาดร้านก่อน (ปุ่ม + ด้านขวาบน)"); return; }
+      const it = {id:uid(), type:b.dataset.t, x:spot.x, y:spot.y,
+        w:Math.min(t.w, db.layout.cols), h:Math.min(t.h, db.layout.rows), label:"", productIds:[]};
+      db.layout.items.push(it);
+      planSel = it.id; save(); drawGrid(); drawProps();
+    };
+  });
+  const resize = (key, d)=>{
+    const L = db.layout;
+    const min = key==="cols"
+      ? Math.max(6, ...L.items.map(i=>i.x+i.w))
+      : Math.max(6, ...L.items.map(i=>i.y+i.h));
+    const v = L[key]+d;
+    if(v<min || v>40) return;
+    L[key] = v; save();
+    el.querySelector(key==="cols"?"#colsVal":"#rowsVal").textContent = v;
+    drawGrid();
+  };
+  el.querySelector("#colsInc").onclick = ()=>resize("cols", 1);
+  el.querySelector("#colsDec").onclick = ()=>resize("cols",-1);
+  el.querySelector("#rowsInc").onclick = ()=>resize("rows", 1);
+  el.querySelector("#rowsDec").onclick = ()=>resize("rows",-1);
+
+  drawGrid(); drawProps();
+}
+
+/* =========================================================
    หน้า: ตั้งค่า
    ========================================================= */
 function renderSettings(el){
@@ -1111,6 +1732,29 @@ function renderSettings(el){
       <div class="field"><label>ค่าเริ่มต้น "แจ้งเตือนเมื่อสต็อกต่ำกว่า"</label>
         <input id="minStockDef" type="number" min="0" value="${db.shop.minStockDefault}"></div>
       <button class="btn" id="saveShop">บันทึก</button>
+    </div>
+    <div class="card">
+      <h3>🤖 ตั้งค่า AI (OpenRouter)</h3>
+      <p class="small muted" style="margin-bottom:12px">
+        ใช้ให้ AI วิเคราะห์ร้านในหน้า "AI วิเคราะห์" — สมัครฟรีที่
+        <a href="https://openrouter.ai/keys" target="_blank" rel="noopener" style="color:var(--accent)">openrouter.ai/keys</a>
+        แล้วสร้าง API key มาใส่ด้านล่าง มีโมเดลฟรี (ลงท้าย :free) ให้ใช้โดยไม่ต้องเติมเงิน
+        <br>🔒 key ถูกเก็บไว้ในเบราว์เซอร์เครื่องนี้เท่านั้น ไม่ถูกส่งไปที่อื่นนอกจาก OpenRouter</p>
+      <div class="field"><label>API Key</label>
+        <input id="aiKey" type="password" value="${esc(db.shop.ai.apiKey)}" placeholder="sk-or-v1-..." autocomplete="off"></div>
+      <div class="field"><label>โมเดล</label>
+        <input id="aiModel" list="modelList" value="${esc(db.shop.ai.model)}" placeholder="เลือกหรือพิมพ์ชื่อโมเดล">
+        <datalist id="modelList">
+          <option value="meta-llama/llama-3.3-70b-instruct:free">ฟรี — Llama 3.3 70B</option>
+          <option value="deepseek/deepseek-chat-v3-0324:free">ฟรี — DeepSeek V3</option>
+          <option value="qwen/qwen3-235b-a22b:free">ฟรี — Qwen3 235B</option>
+          <option value="google/gemini-2.5-flash">เสียเงิน (ถูก) — Gemini 2.5 Flash</option>
+          <option value="anthropic/claude-haiku-4.5">เสียเงิน — Claude Haiku 4.5</option>
+          <option value="openai/gpt-4o-mini">เสียเงิน (ถูก) — GPT-4o mini</option>
+        </datalist>
+        <div class="small muted" style="margin-top:4px">โมเดลลงท้าย :free ใช้ฟรีแต่บางช่วงคิวเต็ม — ถ้าตอบช้า/ไม่ตอบ ลองเปลี่ยนโมเดล</div>
+      </div>
+      <button class="btn" id="saveAI">บันทึกการตั้งค่า AI</button>
     </div>
     <div class="card">
       <h3>💾 สำรอง / ย้ายข้อมูล</h3>
@@ -1141,6 +1785,13 @@ function renderSettings(el){
     el.querySelector("#saveShop").textContent = "บันทึกแล้ว ✓";
     setTimeout(()=>{ el.querySelector("#saveShop").textContent="บันทึก"; },1500);
   };
+  el.querySelector("#saveAI").onclick = ()=>{
+    db.shop.ai.apiKey = el.querySelector("#aiKey").value.trim();
+    db.shop.ai.model = el.querySelector("#aiModel").value.trim() || DEFAULT_DATA.shop.ai.model;
+    save();
+    el.querySelector("#saveAI").textContent = "บันทึกแล้ว ✓";
+    setTimeout(()=>{ el.querySelector("#saveAI").textContent="บันทึกการตั้งค่า AI"; },1500);
+  };
   el.querySelector("#exportBtn").onclick = ()=>{
     const blob = new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
     const a = document.createElement("a");
@@ -1157,7 +1808,7 @@ function renderSettings(el){
         const d = JSON.parse(reader.result);
         if(!d.products || !d.transactions) throw new Error("bad");
         confirmBox("นำเข้าข้อมูลจากไฟล์นี้? ข้อมูลปัจจุบันจะถูกแทนที่ทั้งหมด", ()=>{
-          db = Object.assign(structuredClone(DEFAULT_DATA), d);
+          db = normalizeData(d);
           save(); applyBrand(); go("dash");
         });
       }catch(err){ alert("ไฟล์ไม่ถูกต้อง — ต้องเป็นไฟล์สำรองจากระบบนี้เท่านั้น"); }
@@ -1208,6 +1859,19 @@ function seedDemo(){
   db.employees.push({id:uid()+"emp", name:"น้องชาย", role:"ดูแลร้าน", phone:"", salary:6000, startDate:daysAgoISO(90), active:true});
   // make a few items low-stock for the demo
   prods[0].stock = 2; prods[3].stock = 0; prods[6].stock = 3;
+  // demo shop layout
+  if(!db.layout.items.length){
+    const pid = n => prods[n].id;
+    db.layout.items = [
+      {id:uid()+"d1", type:"door",    x:6,  y:9, w:2, h:1, label:"", productIds:[]},
+      {id:uid()+"c1", type:"counter", x:0,  y:8, w:3, h:1, label:"", productIds:[]},
+      {id:uid()+"s1", type:"shelf",   x:1,  y:1, w:5, h:1, label:"ชั้นขนม",   productIds:[pid(6),pid(7)]},
+      {id:uid()+"s2", type:"shelf",   x:1,  y:3, w:5, h:1, label:"ชั้นของแห้ง", productIds:[pid(3),pid(4),pid(5)]},
+      {id:uid()+"s3", type:"shelf",   x:1,  y:5, w:5, h:1, label:"ชั้นของใช้", productIds:[pid(8),pid(9),pid(10),pid(11)]},
+      {id:uid()+"f1", type:"fridge",  x:13, y:1, w:2, h:2, label:"", productIds:[pid(0),pid(1),pid(2)]},
+      {id:uid()+"i1", type:"icecream",x:13, y:5, w:2, h:1, label:"", productIds:[]}
+    ];
+  }
   save();
 }
 
