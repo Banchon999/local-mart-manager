@@ -159,7 +159,7 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:now
 .prod-pick{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;max-height:430px;overflow-y:auto}
 .prod-card{
   border:1px solid var(--ring);border-radius:12px;padding:10px 12px;background:var(--page);
-  text-align:left;display:flex;flex-direction:column;gap:2px;
+  text-align:left;display:flex;flex-direction:column;gap:2px;color:var(--ink-1);
 }
 .prod-card:hover{border-color:var(--accent)}
 .prod-card:disabled{opacity:.45;cursor:not-allowed}
@@ -580,13 +580,51 @@ function exportProductsCSV(){
   db.products.forEach(p=>rows.push([p.name,p.category||"",p.cost,p.price,p.stock,p.minStock,p.cost*p.stock,p.imageUrl||""]));
   downloadCSV(`รายการสินค้า-${todayISO()}.csv`, rows);
 }
-function exportMovementsCSV(){
-  const rows = [["วันที่","สินค้า","ประเภท","จำนวน","ราคาต่อหน่วย","มูลค่ารวม","หมายเหตุ"]];
-  [...db.movements].sort((a,b)=>a.date.localeCompare(b.date)).forEach(m=>{
+/* ส่งออกประวัติเข้าออก พร้อมตัวกรอง (สินค้า/ประเภท/ช่วงวันที่) และรวมยอดท้ายไฟล์ */
+function exportMovementsCSV(filter={}){
+  const {productId="", type="", from="", to=""} = filter;
+  const list = db.movements
+    .filter(m=> !productId || m.productId===productId)
+    .filter(m=> !type || m.type===type)
+    .filter(m=> !from || m.date>=from)
+    .filter(m=> !to || m.date<=to)
+    .sort((a,b)=>a.date.localeCompare(b.date));
+  const hasProfit = list.some(m=>m.type==="out");
+  const header = ["วันที่","สินค้า","ประเภท","จำนวน","ราคาต่อหน่วย","มูลค่ารวม"];
+  if(hasProfit) header.push("กำไร");
+  header.push("หมายเหตุ");
+  const rows = [header];
+  let qtyIn=0, qtyOut=0, totIn=0, totOut=0, profitSum=0;
+  list.forEach(m=>{
     const p = prodById(m.productId);
-    rows.push([m.date, p?p.name:"(ลบแล้ว)", m.type==="in"?"รับเข้า":"ขายออก", m.qty, m.unit, m.total, m.note||""]);
+    const row = [m.date, p?p.name:"(ลบแล้ว)", m.type==="in"?"รับเข้า":"ขายออก", m.qty, m.unit, m.total];
+    if(hasProfit) row.push(m.type==="out" ? (m.profit??"") : "");
+    row.push(m.note||"");
+    rows.push(row);
+    if(m.type==="in"){ qtyIn+=m.qty; totIn+=m.total; } else { qtyOut+=m.qty; totOut+=m.total; profitSum+=m.profit||0; }
   });
-  downloadCSV(`ประวัติเข้าออก-${todayISO()}.csv`, rows);
+  rows.push([]);
+  rows.push(["สรุป","","จำนวนรายการ",list.length]);
+  rows.push(["","รับเข้า","รวมจำนวน",qtyIn,"รวมมูลค่า",totIn]);
+  rows.push(["","ขายออก","รวมจำนวน",qtyOut,"รวมมูลค่า",totOut, hasProfit?"รวมกำไร":"", hasProfit?profitSum:""]);
+  const p = productId ? prodById(productId) : null;
+  const nameTag = p ? `-${p.name}` : "";
+  const rangeTag = (from||to) ? `_${from||"เริ่ม"}_ถึง_${to||"ล่าสุด"}` : "";
+  downloadCSV(`ประวัติเข้าออก${nameTag}${rangeTag}-${todayISO()}.csv`, rows);
+}
+function exportMovementsModal(){
+  const opts = db.products.map(p=>`<option value="${p.id}">${esc(p.name)}</option>`).join("");
+  openModal("ส่งออกประวัติเข้าออก", `
+    <div class="field"><label>สินค้า</label>
+      <select name="productId"><option value="">ทั้งหมด</option>${opts}</select></div>
+    <div class="field"><label>ประเภทรายการ</label>
+      <select name="type"><option value="">ทั้งหมด (รับเข้า + ขายออก)</option><option value="in">เฉพาะรับเข้า</option><option value="out">เฉพาะขายออก</option></select></div>
+    <div class="form-row">
+      <div class="field"><label>ตั้งแต่วันที่</label><input type="date" name="from"></div>
+      <div class="field"><label>ถึงวันที่</label><input type="date" name="to"></div>
+    </div>
+    <div class="small muted">ไม่เลือกช่วงวันที่ = ส่งออกทุกวัน ไฟล์จะมียอดรวม (จำนวน/มูลค่า/กำไร) แนบท้ายให้ด้วย</div>`,
+    fd=>{ exportMovementsCSV(fd); }, "ส่งออก CSV");
 }
 function buildMonthlyReport(mk){
   const income = monthTx("income", mk), expense = monthTx("expense", mk);
@@ -909,7 +947,7 @@ function renderStock(el){
       <div style="margin-top:12px"><button class="btn secondary sm" id="expProdCsv">📑 ส่งออกรายการสินค้า (CSV)</button></div>
     </div>
     <div class="card"><h3>ประวัติรับเข้า-ขายออก ล่าสุด</h3><div class="tbl-wrap" id="mvTable"></div>
-      <div style="margin-top:12px"><button class="btn secondary sm" id="expMvCsv">📑 ส่งออกประวัติทั้งหมด (CSV)</button></div>
+      <div style="margin-top:12px"><button class="btn secondary sm" id="expMvCsv">📑 ส่งออกประวัติเข้าออก (CSV)...</button></div>
     </div>`;
 
   const draw = (filter="")=>{
@@ -968,7 +1006,7 @@ function renderStock(el){
   el.querySelector("#addProd").onclick = ()=>productModal(null, ()=>{draw(); drawMv();});
   el.querySelector("#stSearch").oninput = e=>draw(e.target.value);
   el.querySelector("#expProdCsv").onclick = exportProductsCSV;
-  el.querySelector("#expMvCsv").onclick = exportMovementsCSV;
+  el.querySelector("#expMvCsv").onclick = exportMovementsModal;
   draw(); drawMv();
 }
 
