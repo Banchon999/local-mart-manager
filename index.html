@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ร้านค้าของเรา — ระบบจัดการร้านค้า</title>
+<script>(function(){try{var t=localStorage.getItem("lmm_theme");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t);}catch(e){}})();</script>
 <style>
 :root{
   --surface-1:#fcfcfb; --page:#f9f9f7;
@@ -25,6 +26,25 @@
     --shadow:0 1px 3px rgba(0,0,0,.4);
   }
 }
+/* เลือกโหมดเองได้ (ปุ่มสลับ) — ชนะทั้งค่าเริ่มต้นและ prefers-color-scheme เสมอ */
+:root[data-theme="light"]{
+  --surface-1:#fcfcfb; --page:#f9f9f7;
+  --ink-1:#0b0b0b; --ink-2:#52514e; --ink-3:#898781;
+  --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
+  --income:#2a78d6; --expense:#e34948; --seq:#2a78d6;
+  --good:#0ca30c; --good-text:#006300; --warning:#fab219; --serious:#ec835a; --critical:#d03b3b;
+  --accent:#2a78d6; --accent-soft:rgba(42,120,214,.10);
+  --shadow:0 1px 3px rgba(0,0,0,.06);
+}
+:root[data-theme="dark"]{
+  --surface-1:#1a1a19; --page:#0d0d0d;
+  --ink-1:#ffffff; --ink-2:#c3c2b7; --ink-3:#898781;
+  --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+  --income:#3987e5; --expense:#e66767; --seq:#3987e5;
+  --good:#0ca30c; --good-text:#0ca30c;
+  --accent:#3987e5; --accent-soft:rgba(57,135,229,.15);
+  --shadow:0 1px 3px rgba(0,0,0,.4);
+}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
 body{
@@ -42,6 +62,11 @@ input,select,textarea{font-family:inherit;font-size:15px}
 }
 .brand{font-size:17px;font-weight:700;padding:6px 12px 18px;display:flex;align-items:center;gap:8px}
 .brand .logo{font-size:22px}
+.theme-toggle{
+  margin-left:auto;border:1px solid var(--ring);background:var(--surface-1);color:var(--ink-2);
+  width:30px;height:30px;border-radius:9px;font-size:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.theme-toggle:hover{border-color:var(--accent)}
 .nav-btn{
   display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:none;background:none;
   border-radius:10px;font-size:15px;color:var(--ink-2);text-align:left;
@@ -253,10 +278,12 @@ footer.credit{color:var(--ink-3);font-size:12px;text-align:center;padding:26px 0
 <body>
 <div class="app">
   <nav class="sidebar" id="sidebar">
-    <div class="brand"><span class="logo">🏪</span><span id="brandName">ร้านค้าของเรา</span></div>
+    <div class="brand"><span class="logo">🏪</span><span id="brandName">ร้านค้าของเรา</span>
+      <button class="theme-toggle" id="themeToggle" type="button" title="สลับโหมดมืด/สว่าง">🌙</button></div>
   </nav>
   <div style="flex:1;min-width:0">
-    <div class="topbar"><span style="font-size:20px">🏪</span><span id="brandNameM">ร้านค้าของเรา</span></div>
+    <div class="topbar"><span style="font-size:20px">🏪</span><span id="brandNameM">ร้านค้าของเรา</span>
+      <button class="theme-toggle" id="themeToggleM" type="button" title="สลับโหมดมืด/สว่าง">🌙</button></div>
     <main class="main" id="main"></main>
     <footer class="credit">ข้อมูลทั้งหมดถูกเก็บไว้ในเครื่องนี้เท่านั้น — อย่าลืมสำรองข้อมูลเป็นประจำ (เมนู ตั้งค่า)</footer>
   </div>
@@ -373,6 +400,33 @@ function salesQtyByProduct(from, to){
 }
 function stockValue(){ return db.products.reduce((s,p)=>s+p.cost*p.stock,0); }
 function lowStockList(){ return db.products.filter(p=>p.stock<=p.minStock); }
+
+/* แจ้งเตือนสต็อกต่ำแบบรวมเป็นรายการเดียว + ปุ่มสั่งซื้อด่วนต่อรายการ (ใช้ในหน้าภาพรวม) */
+function drawLowStock(box, onChange){
+  const low = lowStockList().sort((a,b)=> a.stock - b.stock);
+  if(!low.length){
+    box.innerHTML = `<div class="empty"><span class="e-ico">✅</span>สต็อกทุกรายการยังเพียงพอ</div>`;
+    return;
+  }
+  const outCount = low.filter(p=>p.stock===0).length;
+  box.innerHTML = `
+    <div class="small" style="padding:8px 10px;border-radius:8px;margin-bottom:10px;
+      background:${outCount?'rgba(208,59,59,.12)':'rgba(250,178,25,.15)'};
+      color:${outCount?'var(--critical)':'#a97400'}">
+      ${outCount ? `มี ${NUM(outCount)} รายการสินค้าหมดแล้ว จากทั้งหมด ${NUM(low.length)} รายการที่ต้องเติมสต็อก`
+                  : `มี ${NUM(low.length)} รายการที่เหลือน้อยกว่าจุดแจ้งเตือน — ควรเติมสต็อกเร็วๆ นี้`}
+    </div>
+    <div class="tbl-wrap" style="max-height:280px;overflow-y:auto"><table>
+      ${low.map(p=>`<tr>
+        <td>${esc(p.name)}</td>
+        <td class="num">${p.stock===0?`<span class="badge out">หมด</span>`:`<span class="badge low">เหลือ ${NUM(p.stock)}</span>`}</td>
+        <td class="num"><button class="btn secondary sm qo-btn" data-id="${p.id}">📥 สั่งซื้อด่วน</button></td>
+      </tr>`).join("")}
+    </table></div>`;
+  box.querySelectorAll(".qo-btn").forEach(b=>{
+    b.onclick = ()=>{ stockInModal(prodById(b.dataset.id), onChange); };
+  });
+}
 
 /* =========================================================
    Router
@@ -784,19 +838,8 @@ function renderDash(el){
     .map(x=>({name:x.p.name, value:x.qty, sub:NUM(x.qty)+" ชิ้น"}));
   hBarList(el.querySelector("#topProducts"), top, "var(--seq)");
 
-  // low stock
-  const lowEl = el.querySelector("#lowStock");
-  if(!low.length){
-    lowEl.innerHTML = `<div class="empty"><span class="e-ico">✅</span>สต็อกทุกรายการยังเพียงพอ</div>`;
-  }else{
-    lowEl.innerHTML = `<div class="tbl-wrap"><table>
-      ${low.slice(0,6).map(p=>`<tr>
-        <td>${esc(p.name)}</td>
-        <td class="num">${p.stock===0?`<span class="badge out">หมด</span>`:`<span class="badge low">เหลือ ${NUM(p.stock)}</span>`}</td>
-      </tr>`).join("")}
-    </table></div>
-    ${low.length>6?`<div class="small muted" style="margin-top:6px">และอีก ${low.length-6} รายการ — ดูทั้งหมดที่หน้า สินค้า & สต็อก</div>`:""}`;
-  }
+  // low stock — สรุปรวมเป็นรายการเดียว พร้อมปุ่มสั่งซื้อด่วนต่อรายการ
+  drawLowStock(el.querySelector("#lowStock"), () => renderDash(el));
 
   // recent transactions
   const recent = [...db.transactions].sort((a,b)=>b.date.localeCompare(a.date)||b.id.localeCompare(a.id)).slice(0,8);
@@ -1631,6 +1674,7 @@ function renderPlan(el){
           <span class="small muted">ลึก</span>
           <span class="qty-ctl"><button data-p="h-">−</button><span>${it.h}</span><button data-p="h+">+</button></span>
           <button class="btn secondary sm" id="fxRot">🔄 หมุน</button>
+          <button class="btn secondary sm" id="fxDup">📋 ทำซ้ำ</button>
           <button class="btn sm" id="fxDel" style="background:var(--critical)">🗑️ ลบ</button>
         </div>
         <div style="margin-top:10px">
@@ -1661,6 +1705,16 @@ function renderPlan(el){
       if(planFits(db.layout.items, it.id, it.x, it.y, it.h, it.w)){
         [it.w, it.h] = [it.h, it.w]; save(); drawGrid(); drawProps();
       }
+    };
+    box.querySelector("#fxDup").onclick = ()=>{
+      const spot = planFits(db.layout.items, null, it.x+it.w, it.y, it.w, it.h) ? {x:it.x+it.w, y:it.y}
+        : planFits(db.layout.items, null, it.x, it.y+it.h, it.w, it.h) ? {x:it.x, y:it.y+it.h}
+        : planFindFree(it.w, it.h);
+      if(!spot){ alert("วางทำซ้ำไม่ได้ — พื้นที่เต็มแล้ว ลองขยายขนาดร้านก่อน (ปุ่ม + ด้านขวาบน)"); return; }
+      const copy = {id:uid(), type:it.type, x:spot.x, y:spot.y, w:it.w, h:it.h,
+        label:it.label, productIds:[...(it.productIds||[])]};
+      db.layout.items.push(copy);
+      planSel = copy.id; save(); drawGrid(); drawProps();
     };
     box.querySelector("#fxDel").onclick = ()=>confirmBox(`ลบ "${esc(it.label||t.name)}" ออกจากแปลน?`, ()=>{
       db.layout.items = db.layout.items.filter(x=>x.id!==it.id);
@@ -1913,6 +1967,24 @@ function seedDemo(){
   save();
 }
 
+/* ---------- โหมดมืด/สว่าง (เลือกเองได้ ค่าเริ่มต้นตามเครื่อง) ---------- */
+const THEME_KEY = "lmm_theme";
+function systemPrefersDark(){ return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches; }
+function currentTheme(){ return document.documentElement.getAttribute("data-theme") || (systemPrefersDark() ? "dark" : "light"); }
+function setTheme(t){
+  if(t){ localStorage.setItem(THEME_KEY, t); document.documentElement.setAttribute("data-theme", t); }
+  else{ localStorage.removeItem(THEME_KEY); document.documentElement.removeAttribute("data-theme"); }
+  syncThemeIcons();
+}
+function toggleTheme(){ setTheme(currentTheme()==="dark" ? "light" : "dark"); }
+function syncThemeIcons(){
+  const dark = currentTheme()==="dark";
+  document.querySelectorAll(".theme-toggle").forEach(b=>{
+    b.textContent = dark ? "☀️" : "🌙";
+    b.title = dark ? "สลับเป็นโหมดสว่าง" : "สลับเป็นโหมดมืด";
+  });
+}
+
 /* ---------- boot ---------- */
 function applyBrand(){
   document.getElementById("brandName").textContent = db.shop.name;
@@ -1920,6 +1992,8 @@ function applyBrand(){
   document.title = db.shop.name + " — ระบบจัดการร้านค้า";
 }
 applyBrand();
+document.querySelectorAll(".theme-toggle").forEach(b=>{ b.onclick = toggleTheme; });
+syncThemeIcons();
 go("dash");
 </script>
 </body>
